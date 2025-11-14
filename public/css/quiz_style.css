@@ -1,0 +1,16 @@
+.quiz-button {
+    background-color: transparent;
+}
+
+.quiz-choosed {
+    background-color: #0f0;
+}
+
+.quiz-button:hover {
+    background-color: #ff0;
+    cursor:pointer
+}
+
+.quiz-wrong {
+    background-color: #f00;
+}

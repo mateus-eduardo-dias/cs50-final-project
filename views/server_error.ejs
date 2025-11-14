@@ -1,0 +1,18 @@
+<%- include("layouts/header.ejs") %>
+<main>
+    <!-- Change message (it shows 505 instead of 500)
+    <img src="/img/500.jpg" class="img-fluid">
+     -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-sm-6 py-2 border rounded">
+                <div class="text-center fw-bold fs-4 pb-3 font-monospace">Server error</div>
+                <div class="pb-2">A page you were trying to access had a fatal error, try again later.</div>
+                <div class="text-center">
+                    <a href="/home"><button type="button" class="btn btn-primary btn-schema-1">Home</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<%- include("layouts/footer.ejs") %>

@@ -1,0 +1,36 @@
+<%- include("layouts/header") %>
+<main>
+    <div class="container my-4">
+        <div class="row justify-content-center" id="firstLineUI">
+            <div class="col-6">
+                <h2 class="font-monospace fs-3 fw-bold float-start">Quizzes</h2>
+                <a href="/quiz/create"><button class="btn btn-primary btn-schema-2 float-end px-2 py-1" id="createServersBtn">Create quiz</button></a>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" id="errorModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>A unknown error happened.</p>
+                        <p>Try again later</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-schema-3" data-bs-dismiss="modal" onclick="window.location.href = '/'">Return to main page</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-auto justify-content-center" id="serverListUI">
+            <div class="col">
+                <div id="serversBox">
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="/js/quizElement.js"></script>
+<script src="/js/home.js"></script>
+<%- include("layouts/footer") %>

@@ -1,0 +1,31 @@
+<%- include("layouts/header") %>
+    <main>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-5 border rounded my-5">
+                    <form class="mt-2 mx-4" action="/login" method="post" id="login-form">
+                        <script src="/js/login.js"></script>
+                        <div class="mb-3">
+                            <label for="usernameInput" class="form-label">Username</label>
+                            <input id="usernameInput" class="form-control" type="text" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordInput" class="form-label">Password</label>
+                            <input id="passwordInput" class="form-control" type="password" name="password" required>
+                        </div>
+                        <div class="text-center mb-3">
+                            <button type="submit" class="btn btn-primary btn-schema-3">Log in</button>
+                        </div>
+                        <% if (typeof message != 'undefined' && message) { %>
+                            <div id="alert">
+                                <div class='alert alert-danger p-2' role='alert'>
+                                    <div><%= message %></div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+<%- include("layouts/footer") %>
