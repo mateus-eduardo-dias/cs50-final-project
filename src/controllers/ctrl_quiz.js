@@ -1,4 +1,5 @@
 import utils_db from "../utils/utils_db.js"
+import svc_db from "../services/svc_db.js"
 
 export default {
     async getQuizList(req, res) {
@@ -15,7 +16,7 @@ export default {
         if (!val.auth) {
             res.status(401).end()
             return;
-        } else if (req.body == undefined) {
+        } else if (!req.body) {
             res.status(400).end()
             return;
         } else if (!req.body.answers) {
@@ -23,11 +24,19 @@ export default {
             return;
         }
 
-        const quizRequest = await utils_db.getQuizInfo(req.params.id)
+        const client = await svc_db.connect()
+        if (!client) {
+            res.status(500).end()
+            return;
+        }
+
+        const quizRequest = await utils_db.getQuizInfo(req.params.id, client)
         if (!quizRequest.status) {
+            client.release()
             res.status(500).end()
             return;
         } else if (quizRequest.info.rowCount == 0) {
+            client.release()
             res.status(404).send({'found':false})
             return;
         }
@@ -46,17 +55,17 @@ export default {
             }
         }
 
-        // TODO: Save history
-        const a1 = await utils_db.saveUserHistory(req.signedCookies.uid, req.params.id)
+        const a1 = await utils_db.saveUserHistory(req.signedCookies.uid, req.params.id, client)
+        client.release()
 
-        res.send({'questions': parseInt(i) + 1, 'correct': n_correct, 'wrong': n_wrong, 'info': n_wrong > 0 ? wrong_answers : undefined})
+        res.send({'questions': parseInt(i) + 1, 'correct': n_correct, 'wrong': n_wrong, 'info': n_wrong > 0 ? wrong_answers : undefined, 'saved':a1.status})
         return;
     },
     async createQuiz(val, req, res, next) {
         if (!val.auth) {
             res.status(401).end()
             return;
-        } else if (!req.body || !req.body.title || !req.body.questions || typeof req.body.title != 'string' || typeof req.body.questions != 'object') {
+        } else if (!req.body || !req.body.title || !req.body.questions || req.body.questions.length == 0 || typeof req.body.title != 'string' || typeof req.body.questions != 'object') {
             res.status(400).end()
             return;
         }

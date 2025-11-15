@@ -34,7 +34,7 @@ router.get('/quiz/create/success', (req, res) =>  {
 
 router.get('/quiz/:id', mdwr_auth.verifyAuth, mdwr_api.getQuizInfo, (val, req, res, next) => {
     if (!val.auth) {
-        res.redirect(`/login?status=6`)
+        res.redirect(`/login?status=7`)
     } else if (!val.quiz_status) {
         next(500)
     } else if (!val.quiz_found) {
@@ -94,7 +94,7 @@ router.get('/profile/:id', mdwr_auth.verifyAuth, mdwr_api.getProfileInfo, (val, 
 })
 
 router.get('/500', (req, res, next) => {
-    next('a')
+    next({'errorMessage': '500 Page Example'})
 })
 router.get('/test', ctrl_auth.test)
 router.get('/test/cookies', ctrl_auth.cookies)
@@ -110,10 +110,11 @@ router.use('/*route', (req, res) => {
 
 // 500 Pages
 router.use((val, req, res, next) => {
-    console.log("-- 500 ENDPOINT TRIGGERED --")
-    console.log(val)
-    res.render('server_error', {title:"Quiz Master: 500"})
+    if (val.errorMessage) {
+        res.render('server_error', {title:"Quiz Master: 500", info:val.errorMessage})
+    } else {
+        res.render('server_error', {title:"Quiz Master: 500", info:"Unknown"})
+    }
 })
-
 
 export default router

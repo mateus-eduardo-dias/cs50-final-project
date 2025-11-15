@@ -3,6 +3,7 @@ import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import env from "../configs/env.js"
 import utils_db from "./utils_db.js"
+import svc_db from "../services/svc_db.js"
 
 export default {
     // TODO (When releasing): Change min/max characters for password (Delete whole DB for that)
@@ -47,8 +48,7 @@ export default {
             } else {
                 return {"status": true, "valid": false}
             }
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {"status": false}
         }
         
@@ -66,8 +66,7 @@ export default {
             const tkn = Buffer.concat([cipher.update(text_buffer), cipher.final()])
             const authTag = cipher.getAuthTag()
             return {'status': true, 'token':[iv.toString('base64url'), tkn.toString('base64url'), authTag.toString('base64url')].join('.')}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -80,8 +79,7 @@ export default {
             decipher.setAuthTag(Buffer.from(authTag, 'base64url'))
             const [username, expireTime] = Buffer.concat([decipher.update(Buffer.from(tkn, 'base64url')), decipher.final()]).toString('utf-8').split('-')
             return {"status":true, "username":username, "expiration": parseInt(expireTime)}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -91,8 +89,7 @@ export default {
         try {
             const token = jwt.sign({'uid':userid, 'uname':username}, env.JWT_KEY, {'issuer': 'JohnHarvard', 'expiresIn':900})
             return {'status': true, token}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -104,17 +101,26 @@ export default {
             return {"auth": false};
         }
 
-        const v2 = await utils_db.verifyRefreshToken(signedCookies.refreshToken, signedCookies.uid)
+        const client = await svc_db.connect()
+        if (!client) {
+            return {"auth": false};
+        }
+        
+        const v2 = await utils_db.verifyRefreshToken(signedCookies.refreshToken, parseInt(signedCookies.uid), client)
         if (!v2.status || !v2.valid) {
+            client.release()
             return {"auth":false};
         }
 
-        const v3 = await utils_db.checkUserExists(v1.username)
+        const v3 = await utils_db.checkUserExists(v1.username, client)
         if (!v3.status || !v3.exists || v3.user.id != parseInt(signedCookies.uid)) {
+            client.release()
             return {"auth":false};
         }
 
-        const a1 = this.createAccessToken(signedCookies.uname, signedCookies.uid)
+        client.release()
+
+        const a1 = this.createAccessToken(signedCookies.uname, parseInt(signedCookies.uid))
         if (!a1.status) {
             return {"auth":false};
         }

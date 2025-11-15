@@ -1,6 +1,7 @@
 const title = document.getElementById('title')
 const quizBox = document.getElementById('quiz-container')
 const resultBox = document.getElementById('quiz-result')
+const warnBox = document.getElementById('quiz-warn')
 
 const modal = new bootstrap.Modal(document.getElementById('errorModal'))
 const modalMsg = document.getElementById('errorModalMsg')
@@ -44,10 +45,6 @@ function choose(qid, option) {
     quizOptions[qid] = quizInfo.questions[qid].options[option]
     quizOptionsId[qid] = option
     document.getElementById(`quiz-${qid}-${option}`).classList.add('quiz-choosed')
-
-    console.log("-- REGISTERED --")
-    console.log(quizOptions)
-    console.log(quizOptionsId)
 }
 
 for (let i in quizInfo.questions) {
@@ -65,11 +62,8 @@ for (let i in quizInfo.questions) {
     quizBox.appendChild(e)
 }
 
-console.log(quizOptions)
-console.log(quizOptionsId)
-
 function submitQuiz() {
-    for (let i in quizOptions)  {
+    for (let i in quizOptionsId)  {
         if (quizOptions[i] == null) {
             modalMsg.textContent = `Question no.${i+1} has no answer.`
             modal.show()
@@ -80,21 +74,23 @@ function submitQuiz() {
     fetch(`/api/validate/quiz/${window.location.pathname.split('/')[2]}`, {'method':'POST', 'headers': {'Content-Type': 'application/json'},'body': JSON.stringify({"answers": quizOptions})})
     .then((resp) => {
         if (resp.status == 401) {
-            window.location.href = `/login?status=6`
+            window.location.href = `/login?status=7`
         } else if (resp.status == 400) {
             modalMsg.textContent = `Something went wrong. Try again later.`
             modal.show()
         } else if (resp.status == 500) {
-            modalMsg.textContent = `Server error. Try again later`
+            modalMsg.textContent = `Server error. Try again later.`
             modal.show()
         } else if (resp.status == 404) {
-            modalMsg.textContent = `Questions validation failed. Try again later`
+            modalMsg.textContent = `Could not validate questions. Try again later.`
             modal.show()
         } else {
             return resp.json()
         }
     })
     .then((data) => {
+        warnBox.textContent = data.saved ? "" : "Warning: Data was not saved"
+
         if (data.correct < data.questions) {
             for (let wrong_question of data.info) {
                 document.getElementById(`quiz-${wrong_question.question_id}-${wrong_question.answer_id}`).classList.add('quiz-wrong')
@@ -106,7 +102,8 @@ function submitQuiz() {
         resultBox.textContent = "Congratulations! You've got all the questions right!"
     })
     .catch((err) => {
-        console.log(err)
-        console.log(err.status)
+        modalMsg.textContent = `Unexpected error. Try again later.`
+        modal.show()
+        return;
     })
 }

@@ -1,7 +1,6 @@
 import db from "../configs/db.js"
 
 export default {
-    // TODO (When release): Remove console.log()
     async connect() {
         try {
             return await db.connect()
@@ -27,9 +26,6 @@ export default {
     async rollbackToSavepoint(client, savepoint) {
         await client.query(`ROLLBACK TO ${savepoint}`)
     },
-    async rollbackToSavepointAndCommit(client, savepoint) {
-        await client.query(`ROLLBACK TO ${savepoint}; COMMIT;`)
-    },
 
     // User table
     async getUserByUsername(username, client, lockRow) {
@@ -37,8 +33,7 @@ export default {
             const query = lockRow ? "SELECT * FROM users WHERE username = $1 FOR UPDATE" : "SELECT * FROM users WHERE username = $1"
             const r = await client.query(query, [username])
             return {'status': true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -47,8 +42,7 @@ export default {
             const r = await client.query("INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *", [username, enc_password])
             r.rows[0].id = parseInt(r.rows[0].id)
             return {'status': true, "created": r.rows[0]}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -58,8 +52,7 @@ export default {
         try {
             await client.query("INSERT INTO refresh_tokens VALUES ($1, $2, to_timestamp($3))", [token, userid, expiration])
             return {'status': true}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -68,8 +61,7 @@ export default {
         try {
             const r = await client.query("SELECT * FROM refresh_tokens WHERE token = $1 AND userid = $2", [token, userid])
             return {'status': true, 'rowCount': r.rowCount}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -79,8 +71,7 @@ export default {
         try {
             const r = await client.query("SELECT q.id :: integer, q.title, q.userid :: integer, u.username, COUNT(uh) :: integer as views FROM quizzes as q JOIN users as u ON q.userid = u.id LEFT JOIN user_quiz_histories as uh ON uh.quizid = q.id GROUP BY q.id, u.username")
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -88,8 +79,7 @@ export default {
         try {
             const r = await client.query("SELECT q.*, q.id :: integer, q.userid :: integer, u.username FROM quizzes as q JOIN users as u ON q.userid = u.id WHERE q.id = $1", [id])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -98,8 +88,7 @@ export default {
         try {
             const r = await client.query("INSERT INTO quizzes (title, userid, questions) VALUES ($1, $2, $3) RETURNING *", [title, userid, questions])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -109,8 +98,7 @@ export default {
         try {
             const r = await client.query("INSERT INTO user_quiz_histories (userid, quizid) VALUES ($1, $2) ON CONFLICT (userid, quizid) DO UPDATE SET last_activity_at = NOW()", [userid, quizid])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
+        } catch {
             return {'status': false}
         }
     },
@@ -129,12 +117,10 @@ export default {
         AND uqh.userid = u.id
         WHERE u.id = $1
         GROUP BY u.id, u.username, u.created_at`
-            const options = [userid]
-            const r = await client.query(query, options)
+            const r = await client.query(query, [userid])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
-        } catch (e) {
-            console.log(e)
-            return {'status': false}
+        } catch {
+            return {'status':false}
         }
     }
 }

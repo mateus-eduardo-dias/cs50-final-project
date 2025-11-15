@@ -88,3 +88,6 @@ a
 .add-btn:hover {
     cursor: pointer;
 }
+.error-msg {
+    color: red;
+}

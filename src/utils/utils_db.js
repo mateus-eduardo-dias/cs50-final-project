@@ -19,7 +19,7 @@ export default {
             v1.rows[0].id = parseInt(v1.rows[0].id)
             return {'status':true, 'exists':true, 'user': v1.rows[0]}
         } else {
-            return {'status':true, 'exists': false}
+            return {'status':true, 'exists':false}
         }
     },
     async createUser(username, password, client) {
@@ -105,7 +105,7 @@ export default {
             return {'status':false}
         }
         const a1 = await svc_db.getQuizInfo(quizid, main_client)
-        if (client == undefined) main_client.release();
+        if (!client) main_client.release();
         if (!a1.status) {
             return {'status':false}
         }
@@ -120,11 +120,10 @@ export default {
         const a1 = await svc_db.saveUserHistory(userid, quizid, main_client)
         if (client == undefined) main_client.release();
         if (!a1.status) {
-            console.log("Error at utils_db.saveUserHistory()")
             return {'status':false}
         }
 
-        return {'status': true, 'info': {'rowCount': a1.rowCount, 'rows': a1.rows}}
+        return {'status': true}
     },
     async createQuiz(title, userid, questions, client=undefined) {
         const main_client = client == undefined ? await svc_db.connect() : client;

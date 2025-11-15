@@ -86,7 +86,7 @@ function submitQuiz() {
     const title = document.getElementById('quizNameInput').value
 
     if (typeof title != "string" || !titlePattern.test(title)) {
-        modalMsg.textContent = `Answer for Question no.${i} not found`
+        modalMsg.textContent = `Title should have at least 5 characters`
         modal.show()
         return;
     }
@@ -94,6 +94,25 @@ function submitQuiz() {
     const pattern = /^.{1,}$/i
 
     for (let i = 1; i <= n_questions; i++) {
+        const question = document.getElementById(`questionName-${i}Input`).value
+        if (typeof question != 'string' || !pattern.test(question)) {
+            modalMsg.textContent = `<p>Each question title should have at least one character.</p><p>Question no.${i}</p>`
+            modal.show()
+            return;
+        }
+        
+        const options = [document.getElementById(`opt1-${i}Input`).value, document.getElementById(`opt2-${i}Input`).value, 
+            document.getElementById(`opt3-${i}Input`).value, document.getElementById(`opt4-${i}Input`).value]
+        if (typeof options[0] != "string" || typeof options[1] != "string" || typeof options[2] != "string" || typeof options[3] != "string") {
+            modalMsg.innerHTML = `<p>A option is invalid.</p><p>Question no.${i}</p>`
+            modal.show()
+            return;
+        } else if (!pattern.test(options[0]) || !pattern.test(options[1]) || !pattern.test(options[2]) || !pattern.test(options[3])) {
+            modalMsg.innerHTML = `<p>Each option should have at least one character.</p><p>Question no.${i}</p>`
+            modal.show()
+            return;
+        }
+
         const answer = document.getElementById(`answer-${i}Select`).value
         if (isNaN(answer) || typeof answer != 'string') {
             modalMsg.textContent = `Answer for Question no.${i} not found`
@@ -106,26 +125,8 @@ function submitQuiz() {
             modal.show()
             return;
         }
-        
-        const options = [document.getElementById(`opt1-${i}Input`).value, document.getElementById(`opt2-${i}Input`).value, 
-            document.getElementById(`opt3-${i}Input`).value, document.getElementById(`opt4-${i}Input`).value]
-        if (typeof options[0] != "string" || typeof options[1] != "string" || typeof options[2] != "string" || typeof options[3] != "string") {
-            modalMsg.textContent = `A option is invalid.\nQuestion no.${i}`
-            modal.show()
-            return;
-        } else if (!pattern.test(options[0]) || !pattern.test(options[1]) || !pattern.test(options[2]) || !pattern.test(options[3])) {
-            modalMsg.textContent = `Each option should have at least one character.\nQuestion no.${i}`
-            modal.show()
-            return;
-        }
-        const question = document.getElementById(`questionName-${i}Input`).value
-        if (typeof question != 'string' || !pattern.test(question)) {
-            modalMsg.textContent = `Each question title should have at least one character.\nQuestion no.${i}`
-            modal.show()
-            return;
-        }
+
         questions.push({ question, options, answer: int_answer})
-        
     }
 
     const body = {
@@ -135,7 +136,7 @@ function submitQuiz() {
     fetch('/api/quiz', {'method': 'POST', 'headers': {'Content-Type': 'application/json'}, body: JSON.stringify(body)})
     .then((resp) => {
         if (resp.status == 401) {
-            window.location.href = `/login?status=6`
+            window.location.href = `/login?status=7`
         } else if (resp.status == 400) {
             modalMsg.textContent = "Bad request: Try again later."
             modal.show()
@@ -152,6 +153,9 @@ function submitQuiz() {
     .then((data) => {
         if (data != undefined) {
             window.location.href = `/quiz/create/success?id=${data.id}`
+        } else {
+            modalMsg.textContent = "Unknown error."
+            modal.show()
         }
     })
     .catch((err) => {

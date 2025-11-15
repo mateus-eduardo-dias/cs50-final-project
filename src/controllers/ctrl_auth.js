@@ -2,9 +2,6 @@ import utils_auth from "../utils/utils_auth.js"
 import utils_db from "../utils/utils_db.js"
 import svc_db from "../services/svc_db.js"
 
-// Everything works perfectly
-// Peace at last! Prosperity is the answer (Not war)! -- Empire Clash reference xd
-
 export default {
     async signup(req, res, next) {
         const v1 = utils_auth.checkSignupForm(req.body)
@@ -46,7 +43,8 @@ export default {
 
         const a2 = await utils_db.createRefreshToken(a1.created.username, a1.created.id, expiration.getTime(), client)
         if (!a2.status) {
-            await svc_db.rollbackToSavepointAndCommit(client, 'user_created')
+            await svc_db.rollbackToSavepoint(client, 'user_created')
+            await svc_db.commit(client)
             client.release()
             res.redirect("/login?status=6")
             return;
@@ -54,7 +52,8 @@ export default {
 
         const a3 = utils_auth.createAccessToken(a1.created.username, a1.created.id)
         if (!a3.status) {
-            await svc_db.rollbackToSavepointAndCommit(client, 'user_created')
+            await svc_db.rollbackToSavepoint(client, 'user_created')
+            await svc_db.commit(client)
             client.release()
             res.redirect("/login?status=6")
             return;
