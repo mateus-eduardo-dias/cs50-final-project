@@ -92,6 +92,14 @@ export default {
             return {'status': false}
         }
     },
+    async deleteQuiz(question_id, user_id, client) {
+        try {
+            const r = await client.query("DELETE FROM quizzes WHERE id = $1 AND userid = $2 RETURNING *", [question_id, user_id])
+            return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
+        } catch {
+            return {'status': false}
+        }
+    },
 
     // User history
     async saveUserHistory(userid, quizid, client) {

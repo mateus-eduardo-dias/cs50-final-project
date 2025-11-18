@@ -1,5 +1,6 @@
 import utils_db from "../utils/utils_db.js"
 import svc_db from "../services/svc_db.js"
+import utils_auth from "../utils/utils_auth.js"
 
 export default {
     async getQuizList(req, res) {
@@ -104,6 +105,62 @@ export default {
         }
 
         res.status(201).send({'id': parseInt(a1.info.rows[0].id)})
+        return;
+    },
+    async deleteQuiz(val, req, res, next) {
+        if (!req.body || !req.body.id || !req.body.password || typeof req.body.password != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(req.body.password))) {
+            res.status(400).end()
+            return;
+        }
+
+        const client = await svc_db.connect()
+        if (!client) {
+            res.status(500).end()
+        }
+
+        const v1 = await utils_db.checkUserExists(req.signedCookies.uname, client)
+
+        if (!v1.status) {
+            client.release()
+            res.status(500).end()
+            return;
+        } else if (!v1.exists) {
+            client.release()
+            res.cookie('refreshToken', '', {'signed':true, 'sameSite':true, 'httpOnly':true, 'maxAge':0})
+            res.cookie('accessToken', '', {'signed':true, 'sameSite':true, 'httpOnly':true, 'maxAge':0})
+            res.cookie('uid', '', {'signed':true, 'sameSite':true, 'httpOnly':true, 'maxAge': 0})
+            res.cookie('uname', '', {'signed':true, 'sameSite': true, 'httpOnly':true, 'maxAge': 0})
+            res.status(401).end()
+            return;
+        } else if (v1.user.id != parseInt(req.signedCookies.uid)) {
+            client.release()
+            res.status(403).end()
+            return;
+        }
+
+        const v2 = await utils_auth.verifyPassword(req.body.password, v1.user.password)
+        if (!v2.status) {
+            client.release()
+            res.status(500).end()
+            return;
+        } else if (!v2.valid) {
+            client.release()
+            res.status(403).end()
+            return;
+        }
+
+        const v3 = await utils_db.deleteQuiz(req.body.id, req.signedCookies.uid, client)
+        if (!v3.status) {
+            client.release()
+            res.status(500).end()
+            return;
+        } else if (v3.rowCount == 0) {
+            client.release()
+            res.status(404).end()
+            return;
+        }
+
+        res.send({'deleted': req.body.id})
         return;
     }
 }

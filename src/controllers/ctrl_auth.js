@@ -83,7 +83,7 @@ export default {
         }
         await svc_db.begin(client)
 
-        const v2 = await utils_db.checkUserExists(req.body.username, client, false)
+        const v2 = await utils_db.checkUserExists(req.body.username, client)
         if (!v2.status) {
             await svc_db.rollback(client)
             client.release()

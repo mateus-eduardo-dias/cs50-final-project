@@ -89,17 +89,20 @@ function submitQuiz() {
         }
     })
     .then((data) => {
-        warnBox.textContent = data.saved ? "" : "Warning: Data was not saved"
+        if (data) {
+            warnBox.textContent = data.saved ? "" : "Warning: Data was not saved"
 
-        if (data.correct < data.questions) {
-            for (let wrong_question of data.info) {
-                document.getElementById(`quiz-${wrong_question.question_id}-${wrong_question.answer_id}`).classList.add('quiz-wrong')
+            if (data.correct < data.questions) {
+                for (let wrong_question of data.info) {
+                    document.getElementById(`quiz-${wrong_question.question_id}-${wrong_question.answer_id}`).classList.add('quiz-wrong')
+                }
+                resultBox.textContent = `You got ${data.correct} of ${data.questions} (${data.correct / data.questions * 100}%)`
+                return;
             }
-            resultBox.textContent = `You got ${data.correct} of ${data.questions} (${data.correct / data.questions * 100}%)`
-            return;
-        }
 
-        resultBox.textContent = "Congratulations! You've got all the questions right!"
+            resultBox.textContent = "Congratulations! You've got all the questions right!"
+        }
+        
     })
     .catch((err) => {
         modalMsg.textContent = `Unexpected error. Try again later.`

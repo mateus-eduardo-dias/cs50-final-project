@@ -52,6 +52,8 @@ router.get('/api/quizzes', ctrl_quiz.getQuizList) // Get quizzes
 router.post('/api/validate/quiz/:id', mdwr_auth.verifyAuth, ctrl_quiz.validateQuiz) // Validate quiz
 router.post('/api/quiz', mdwr_auth.verifyAuth, ctrl_quiz.createQuiz) // Add quiz
 
+router.delete('/api/quiz', mdwr_auth.verifyAuth, ctrl_quiz.deleteQuiz)
+
 router.get('/login', (req, res) => {
     const loginMessages = ["A field is missing.", "Bad request: Reload the page and try again later.", "Username should have 5-15 characters (A-Z/a-z/0-9/_).", 
     "Password should have 4-30 characters (A-Z/a-z/0-9/_).", "User not found.", "Incorrect password.", "Account created, login to continue.", "Authentication failed, login to continue."]
@@ -87,7 +89,7 @@ router.get('/profile/:id', mdwr_auth.verifyAuth, mdwr_api.getProfileInfo, (val, 
     if (val.profileStatus == 404) next()
     else if (val.profileStatus == 500) next({'errorMessage': 'Error when loading profile'})
     else if (val.auth) {
-        res.render('profile', {title:"Quiz Master: Profile", auth:{uid: req.signedCookies.uid, uname: req.cookies.uname}, bicons:true, profileInfo: val.profileInfo})
+        res.render('profile', {title:"Quiz Master: Profile", auth:{uid: req.signedCookies.uid, uname: req.cookies.uname}, bicons:true, profileInfo: {...val.profileInfo, yourId:req.signedCookies.uid}})
     } else {
         res.render('profile', {title:"Quiz Master: Profile", bicons:true, profileInfo: val.profileInfo})
     }

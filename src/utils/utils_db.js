@@ -137,5 +137,18 @@ export default {
         }
 
         return {'status': true, 'rowCount': a1.rowCount, 'rows': a1.rows}
+    },
+    async deleteQuiz(question_id, user_id, client=undefined) {
+        const main_client = client == undefined ? await svc_db.connect() : client;
+        if (!main_client) {
+            return {'status':false}
+        }
+        const a1 = await svc_db.deleteQuiz(question_id, user_id, main_client)
+        if (client == undefined) main_client.release();
+        if (!a1.status) {
+            return {'status':false}
+        }
+
+        return {'status': true, 'rowCount': a1.rowCount, 'rows': a1.rows}
     }
 }

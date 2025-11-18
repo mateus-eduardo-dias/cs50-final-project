@@ -151,11 +151,8 @@ function submitQuiz() {
         }
     })
     .then((data) => {
-        if (data != undefined) {
+        if (data) {
             window.location.href = `/quiz/create/success?id=${data.id}`
-        } else {
-            modalMsg.textContent = "Unknown error."
-            modal.show()
         }
     })
     .catch((err) => {
