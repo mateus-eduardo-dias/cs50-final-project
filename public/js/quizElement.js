@@ -2,8 +2,6 @@ class QuizElementDeletable extends HTMLElement {
     constructor() {
         super();
     }
-    // profile.js has deleteQuiz()
-    // TODO: Lógica para deletar quiz
 
     connectedCallback() {
         const col_size = this.getAttribute('balanced') == 'true' ? 'col' : 'col-6'

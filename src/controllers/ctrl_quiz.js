@@ -160,7 +160,7 @@ export default {
             return;
         }
 
-        res.send({'deleted': req.body.id})
+        res.send({'deleted': req.body.id, 'name': v3.rows[0].title})
         return;
     }
 }

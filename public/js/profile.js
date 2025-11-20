@@ -94,12 +94,14 @@ function deleteQuizUI(qid, qname) {
 }
 function deleteQuiz() {
     if (toDelete == undefined) {
-        // TODO: Error
+        errorModalMsg.textContent = 'No quiz choosed.'
+        errorModal.show()
         return;
     }
     const passwordInput = document.getElementById('passwordInput').value
     if (typeof passwordInput != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(passwordInput))) {
-        // TODO: Error
+        errorModalMsg.textContent = 'Unauthorized - Password possibly invalid.'
+        errorModal.show()
         return;
     } else {
         fetch('/api/quiz', {method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:toDelete, password:passwordInput})})
@@ -113,9 +115,8 @@ function deleteQuiz() {
                     window.location.href = '/login?status=7'
                     return;
                 case 403:
-                    errorModalMsg.textContent = 'Unauthorized - Failed to validate credentials'
+                    errorModalMsg.textContent = 'Unauthorized - Password invalid.'
                     errorModal.show()
-                    console.log(1)
                     return;
                 case 404:
                     errorModalMsg.textContent = 'Quiz not found'
@@ -131,7 +132,7 @@ function deleteQuiz() {
         })
         .then((data) =>  {
             if (data) {
-                successModalMsg.textContent = `Quiz deleted; ID=${data.deleted}`
+                successModalMsg.innerHTML = `<p>Quiz deleted</p><p>Name: ${data.name}</p><p>ID: ${data.deleted}</p>`
                 successModal.show()
                 return;
             }
