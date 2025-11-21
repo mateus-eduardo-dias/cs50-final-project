@@ -138,14 +138,19 @@ export default {
 
         return {'status': true, 'rowCount': a1.rowCount, 'rows': a1.rows}
     },
-    async deleteQuiz(question_id, user_id, client=undefined) {
+    async deleteQuiz(quiz_id, user_id, client=undefined) {
         const main_client = client == undefined ? await svc_db.connect() : client;
         if (!main_client) {
             return {'status':false}
         }
-        const a1 = await svc_db.deleteQuiz(question_id, user_id, main_client)
-        if (client == undefined) main_client.release();
+        const a1 = await svc_db.deleteQuiz(quiz_id, user_id, main_client)
         if (!a1.status) {
+            if (client == undefined) main_client.release();
+            return {'status':false}
+        }
+        const a2 = await svc_db.deleteQuizHistory(quiz_id, main_client)
+        if (client == undefined) main_client.release();
+        if (!a2.status) {
             return {'status':false}
         }
 

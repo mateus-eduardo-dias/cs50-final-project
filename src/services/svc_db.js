@@ -92,10 +92,18 @@ export default {
             return {'status': false}
         }
     },
-    async deleteQuiz(question_id, user_id, client) {
+    async deleteQuiz(quiz_id, user_id, client) {
         try {
-            const r = await client.query("DELETE FROM quizzes WHERE id = $1 AND userid = $2 RETURNING *", [question_id, user_id])
+            const r = await client.query("DELETE FROM quizzes WHERE id = $1 AND userid = $2 RETURNING *", [quiz_id, user_id])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
+        } catch {
+            return {'status': false}
+        }
+    },
+    async deleteQuizHistory(quiz_id, client) {
+        try {
+            await client.query("DELETE FROM user_quiz_histories WHERE quizid = $1", [quiz_id])
+            return {"status":true}
         } catch {
             return {'status': false}
         }
