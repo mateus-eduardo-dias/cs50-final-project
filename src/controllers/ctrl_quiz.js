@@ -108,7 +108,7 @@ export default {
         return;
     },
     async deleteQuiz(val, req, res, next) {
-        if (!req.body || !req.body.id || !req.body.password || typeof req.body.password != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(req.body.password))) {
+        if (!req.body || !req.body.id || !req.body.password || typeof req.body.password != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{6,30}$/i.test(req.body.password))) {
             res.status(400).end()
             return;
         }

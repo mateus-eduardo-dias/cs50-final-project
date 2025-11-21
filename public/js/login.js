@@ -9,7 +9,7 @@ form.onsubmit = (e) => {
     } else if (!(/^[A-Z_0-9.]{5,15}$/i.test(username))) {
         window.location.href = '/login?status=2'
         e.preventDefault()
-    } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(password))) {
+    } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{6,30}$/i.test(password))) {
         window.location.href = '/login?status=3'
         e.preventDefault()
     }

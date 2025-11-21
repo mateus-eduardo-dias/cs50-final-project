@@ -99,7 +99,7 @@ function deleteQuiz() {
         return;
     }
     const passwordInput = document.getElementById('passwordInput').value
-    if (typeof passwordInput != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(passwordInput))) {
+    if (typeof passwordInput != 'string' || !(/^[A-Z_0-9.@#$%^&+=!-]{6,30}$/i.test(passwordInput))) {
         errorModalMsg.textContent = 'Unauthorized - Password possibly invalid.'
         errorModal.show()
         return;

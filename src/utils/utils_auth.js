@@ -6,7 +6,6 @@ import utils_db from "./utils_db.js"
 import svc_db from "../services/svc_db.js"
 
 export default {
-    // TODO (When releasing): Change min/max characters for password (Delete whole DB for that)
     checkSignupForm(body) {
         if (!body || !body.username || !body.password || !body.cpassword) {
             return {'status': false, 'code': 0}
@@ -14,7 +13,7 @@ export default {
             return {'status': false, 'code': 1}
         } else if (!(/^[A-Z_0-9.]{5,15}$/i.test(body.username))) {
             return {'status': false, 'code': 2}
-        } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(body.password))) {
+        } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{6,30}$/i.test(body.password))) {
             return {'status': false, 'code': 3}
         } else if (body.password != body.cpassword) {
             return {'status': false, 'code': 4}
@@ -28,7 +27,7 @@ export default {
             return {'status': false, 'code': 1}
         } else if (!(/^[A-Z_0-9.]{5,15}$/i.test(body.username))) {
             return {'status': false, 'code': 2}
-        } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{4,30}$/i.test(body.password))) {
+        } else if (!(/^[A-Z_0-9.@#$%^&+=!-]{6,30}$/i.test(body.password))) {
             return {'status': false, 'code': 3}
         }
         return {'status': true}
