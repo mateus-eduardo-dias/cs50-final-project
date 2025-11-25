@@ -56,7 +56,7 @@ router.delete('/api/quiz', mdwr_auth.verifyAuth, ctrl_quiz.deleteQuiz)
 
 router.get('/login', (req, res) => {
     const loginMessages = ["A field is missing.", "Bad request: Reload the page and try again later.", "Username should have 5-15 characters (A-Z/a-z/0-9/_).", 
-    "Password should have 4-30 characters (A-Z/a-z/0-9/_).", "User not found.", "Incorrect password.", "Account created, login to continue.", "Authentication failed, login to continue."]
+    "Password should have 6-30 characters (A-Z/a-z/0-9/_).", "User not found.", "Incorrect password.", "Account created, login to continue.", "Authentication failed, login to continue."]
 
     if (req.query.status && req.query.status in Object.keys(loginMessages)) {
         res.render("login", {title:"Quiz Master: Login", message:loginMessages[req.query.status]})
@@ -70,7 +70,7 @@ router.get('/login', (req, res) => {
 router.get('/signup', (req, res) => {
     const signupMessages = 
     ["A field is missing.", "Bad request: Reload the page and try again later.", "Username should have 5-15 characters (A-Z/a-z/0-9/_).", 
-    "Password should have 4-30 characters (A-Z/a-z/0-9/_).", "Passwords's are different.", "User already exists."]
+    "Password should have 6-30 characters (A-Z/a-z/0-9/_).", "Passwords's are different.", "User already exists."]
 
     if (req.query.status && signupMessages.length > req.query.status) {
         res.render("signup", {title:"Quiz Master: Signup", message:signupMessages[req.query.status]})

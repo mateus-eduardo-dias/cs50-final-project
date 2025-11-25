@@ -79,9 +79,19 @@ main > div
 {
     height: fit-content;
 }
+
 a
 {
     text-decoration: none;
+    color: inherit;
+}
+.a-bypass-default
+{
+    color: #a00;
+}
+.a-bypass-default:hover
+{
+    text-decoration: dashed;
     color: inherit;
 }
 

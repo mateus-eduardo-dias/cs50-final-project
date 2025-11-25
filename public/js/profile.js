@@ -13,8 +13,6 @@ const errorModalMsg = document.getElementById('errorModalMsg')
 const successModal = new bootstrap.Modal(document.getElementById('successModal'))
 const successModalMsg = document.getElementById('successModalMsg')
 
-console.log(userInfo)
-
 const n_user_quizzes = userInfo.user_quizzes.length
 let n_loaded_user_quizzes = 0
 

@@ -143,16 +143,16 @@ export default {
         if (!main_client) {
             return {'status':false}
         }
-        const a1 = await svc_db.deleteQuiz(quiz_id, user_id, main_client)
-        if (!a1.status) {
-            if (client == undefined) main_client.release();
-            return {'status':false}
-        }
-        const a2 = await svc_db.deleteQuizHistory(quiz_id, main_client)
+        svc_db.begin(main_client)
+        const a1 = svc_db.deleteQuiz(quiz_id, user_id, main_client)
+        const a2 = svc_db.deleteQuizHistory(quiz_id, main_client)
+        const [r1, r2] = await Promise.all([a1, a2])
         if (client == undefined) main_client.release();
-        if (!a2.status) {
+        if (!r1.status || !r2.status) {
+            svc_db.rollback(main_client)
             return {'status':false}
         }
+        svc_db.commit(main_client)
 
         return {'status': true, 'rowCount': a1.rowCount, 'rows': a1.rows}
     }

@@ -63,13 +63,17 @@ export default {
         return;
     },
     async createQuiz(val, req, res, next) {
+        // TODO: Check if solved
+        // CHECKPOINT
         if (!val.auth) {
             res.status(401).end()
             return;
-        } else if (!req.body || !req.body.title || !req.body.questions || req.body.questions.length == 0 || typeof req.body.title != 'string' || typeof req.body.questions != 'object') {
+        } else if (!req.body || !req.body.title || !req.body.questions || req.body.questions.length == 0 || typeof req.body.title != 'string' || typeof req.body.questions != 'object' || !/^.{5,}$/i.test(req.body.title)) {
             res.status(400).end()
             return;
         }
+
+        const pattern = /^.{1,}$/i
 
         for (let questionInfo of req.body.questions) {
             const answerId = questionInfo.answer
@@ -82,7 +86,8 @@ export default {
             if (typeof options[0] != 'string' || typeof options[1] != 'string' || typeof options[2] != 'string' || typeof options[3] != 'string') {
                 res.status(400).end()
                 return;
-            } else if (!pattern.test(options[0]) || !pattern.test(options[1]) || !pattern.test(options[2]) || !pattern.test(options[3])) {
+            }
+            if (!pattern.test(options[0]) || !pattern.test(options[1]) || !pattern.test(options[2]) || !pattern.test(options[3])) {
                 res.status(400).end()
                 return;
             }
@@ -91,20 +96,20 @@ export default {
                 res.status(400).end()
                 return;
             }
-
             questionInfo.answer = questionInfo.options[answerId]
         }
+
 
         const a1 = await utils_db.createQuiz(req.body.title, req.signedCookies.uid, req.body.questions)
         if (!a1.status) {
             res.status(500).end()
             return;
-        } else if (a1.info.rowCount == 0) {
+        } else if (a1.rowCount == 0) {
             res.status(204).end()
             return;
         }
 
-        res.status(201).send({'id': parseInt(a1.info.rows[0].id)})
+        res.status(201).send({'id': parseInt(a1.rows[0].id)})
         return;
     },
     async deleteQuiz(val, req, res, next) {

@@ -86,7 +86,7 @@ export default {
 
     async createQuiz(title, userid, questions, client) {
         try {
-            const r = await client.query("INSERT INTO quizzes (title, userid, questions) VALUES ($1, $2, $3) RETURNING *", [title, userid, questions])
+            const r = await client.query("INSERT INTO quizzes (title, userid, questions) VALUES ($1, $2, $3) RETURNING *", [title, userid, JSON.stringify(questions)])
             return {"status":true, 'rowCount': r.rowCount, 'rows': r.rows}
         } catch {
             return {'status': false}
