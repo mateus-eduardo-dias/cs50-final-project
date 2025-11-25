@@ -63,8 +63,6 @@ export default {
         return;
     },
     async createQuiz(val, req, res, next) {
-        // TODO: Check if solved
-        // CHECKPOINT
         if (!val.auth) {
             res.status(401).end()
             return;
